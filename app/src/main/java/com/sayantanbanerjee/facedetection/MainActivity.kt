@@ -22,13 +22,16 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent()
             intent.type = "image/*"
             intent.action = Intent.ACTION_GET_CONTENT
-            startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_Photo)), REQUEST_GALLERY_CODE)
+            startActivityForResult(
+                Intent.createChooser(intent, getString(R.string.choose_Photo)),
+                REQUEST_GALLERY_CODE
+            )
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_GALLERY_CODE){
+        if (requestCode == REQUEST_GALLERY_CODE) {
             imageView.setImageURI(data?.data)
         }
     }
