@@ -3,4 +3,7 @@
     <string name="button_text">Choose Photo From Gallery</string>
     <string name="choose_Photo">Choose Photo</string>
     <string name="image_view_content_desc">Gallery image</string>
+    <string name="face_detecting">Face detecting&#8230;</string>
+    <string name="face_found">Face found</string>
+    <string name="face_not_found">Face didn\'t found</string>
 </resources>
