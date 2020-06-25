@@ -18,12 +18,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         imageView = findViewById(R.id.imageView)
         button = findViewById(R.id.button)
-
         button.setOnClickListener {
-            val intent : Intent ?= null
-            intent?.type = "image/*"
-            intent?.action = Intent.ACTION_GET_CONTENT
-            startActivityForResult(intent, REQUEST_GALLERY_CODE)
+            val intent = Intent()
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_Photo)), REQUEST_GALLERY_CODE)
         }
     }
 
