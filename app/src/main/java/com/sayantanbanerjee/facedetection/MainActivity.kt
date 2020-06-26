@@ -11,6 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.label.ImageLabeler
+import com.google.mlkit.vision.label.ImageLabeling
+import com.google.mlkit.vision.label.automl.AutoMLImageLabelerLocalModel
+import com.google.mlkit.vision.label.automl.AutoMLImageLabelerOptions
 import java.io.IOException
 
 
@@ -18,12 +23,23 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
     private lateinit var button: Button
+    private lateinit var labeler: ImageLabeler
     private val REQUEST_GALLERY_CODE: Int
         get() = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val localModel = AutoMLImageLabelerLocalModel.Builder()
+            .setAssetFilePath("modelfiles/manifest.json")
+            .build()
+
+        val autoMLImageLabelerOptions = AutoMLImageLabelerOptions.Builder(localModel)
+            .setConfidenceThreshold(0.0F)
+            .build()
+        labeler = ImageLabeling.getClient(autoMLImageLabelerOptions)
+
         imageView = findViewById(R.id.imageView)
         button = findViewById(R.id.button)
         button.setOnClickListener {
@@ -72,18 +88,44 @@ class MainActivity : AppCompatActivity() {
                             //face_detected
                             for (face in it) {
                                 val bounds: Rect = face.boundingBox
+                                val paint : Paint = Paint()
 
                                 val resizedbitmap =
                                     Bitmap.createBitmap(mutableBitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
 
-                                val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-                                paint.color = Color.RED
+                                val tempImage =
+                                    InputImage.fromBitmap(resizedbitmap, 0)
+
+                                var mask_confidence : Float = 0F
+                                var nomask_confidence : Float = 0F
+
+                                labeler.process(tempImage)
+                                    .addOnSuccessListener { labels ->
+                                        for (label in labels) {
+                                            val text = label.text
+                                            if (text.equals("mask")){
+                                                mask_confidence = label.confidence
+                                            }else{
+                                                nomask_confidence = label.confidence
+                                            }
+                                        }
+
+                                        if(nomask_confidence >= mask_confidence){
+                                            paint.color = Color.RED
+                                        }else{
+                                            paint.color = Color.GREEN
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        paint.color = Color.BLUE
+                                    }
+
                                 paint.strokeWidth = 10F
-                                paint.style = Paint.Style.FILL
+                                paint.style = Paint.Style.STROKE
                                 canvas.drawRect(bounds,paint)
-                                imageView.setImageBitmap(resizedbitmap)
+
                             }
-                        //    imageView.setImageBitmap(mutableBitmap)
+                            imageView.setImageBitmap(mutableBitmap)
                             Toast.makeText(this, getString(R.string.face_found), Toast.LENGTH_LONG).show()
                         }
                         .addOnFailureListener {
