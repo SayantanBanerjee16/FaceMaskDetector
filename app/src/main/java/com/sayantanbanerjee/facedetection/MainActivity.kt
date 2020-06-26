@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.*
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() {
             val image: FirebaseVisionImage
             try {
                 image = FirebaseVisionImage.fromFilePath(this, data.data!!)
+                val bmpForTempImage : Bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver , data.data)
                 val bmp : Bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver , data.data)
                 val mutableBitmap : Bitmap = bmp.copy(Bitmap.Config.ARGB_8888,true)
                 val canvas : Canvas = Canvas(mutableBitmap)
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                                 val paint : Paint = Paint()
 
                                 val resizedbitmap =
-                                    Bitmap.createBitmap(mutableBitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
+                                    Bitmap.createBitmap(bmpForTempImage, bounds.left, bounds.top, bounds.width(), bounds.height())
 
                                 val tempImage =
                                     InputImage.fromBitmap(resizedbitmap, 0)
@@ -103,6 +105,7 @@ class MainActivity : AppCompatActivity() {
                                     .addOnSuccessListener { labels ->
                                         for (label in labels) {
                                             val text = label.text
+                                            Log.i("#########",text)
                                             if (text.equals("mask")){
                                                 mask_confidence = label.confidence
                                             }else{
@@ -110,29 +113,36 @@ class MainActivity : AppCompatActivity() {
                                             }
                                         }
 
+                                        Log.i("NO MASK ###",nomask_confidence.toString())
+                                        Log.i("MASK ###",mask_confidence.toString())
+
                                         if(nomask_confidence >= mask_confidence){
+                                            val canvas : Canvas = Canvas(mutableBitmap)
+                                            Log.i("AANDAR ###",nomask_confidence.toString())
                                             paint.color = Color.RED
+                                            paint.strokeWidth = 10F
+                                            paint.style = Paint.Style.STROKE
+                                            canvas.drawRect(bounds,paint)
                                         }else{
+                                            val canvas : Canvas = Canvas(mutableBitmap)
                                             paint.color = Color.GREEN
+                                            paint.strokeWidth = 10F
+                                            paint.style = Paint.Style.STROKE
+                                            canvas.drawRect(bounds,paint)
                                         }
+                                        imageView.setImageBitmap(mutableBitmap)
                                     }
                                     .addOnFailureListener { e ->
-                                        paint.color = Color.BLUE
+                                        
                                     }
 
-                                paint.strokeWidth = 10F
-                                paint.style = Paint.Style.STROKE
-                                canvas.drawRect(bounds,paint)
-
                             }
-                            imageView.setImageBitmap(mutableBitmap)
                             Toast.makeText(this, getString(R.string.face_found), Toast.LENGTH_LONG).show()
                         }
                         .addOnFailureListener {
                             //face_not_detected
                             Toast.makeText(this, getString(R.string.face_not_found), Toast.LENGTH_LONG).show()
                         }
-
             } catch (e: IOException) {
                 e.printStackTrace()
             }
