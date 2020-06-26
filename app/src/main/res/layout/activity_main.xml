@@ -12,10 +12,10 @@
         android:layout_height="match_parent"
         android:layout_above="@id/summary"
         android:layout_marginBottom="20dp"
+        android:src="@drawable/facemask"
         android:contentDescription="@string/image_view_content_desc"
         android:foregroundGravity="center_vertical"
-        android:scaleType="centerInside"
-        app:srcCompat="@drawable/ic_launcher_background" />
+        android:scaleType="centerInside" />
 
     <LinearLayout
         android:id="@+id/summary"
@@ -25,10 +25,10 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/faceFound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/face_found_number"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -40,21 +40,21 @@
             android:padding="16dp">
 
             <TextView
+                android:id="@+id/withMask"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text="@string/with_mask"
                 android:textColor="@color/Green"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/withoutMask"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity=""
                 android:layout_weight="1"
-                android:text="@string/without_mask"
                 android:textAlignment="textEnd"
                 android:textColor="@color/Red"
                 android:textSize="20sp"

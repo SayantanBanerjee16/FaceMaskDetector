@@ -7,7 +7,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Toast
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -25,8 +25,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var button: Button
     private lateinit var labeler: ImageLabeler
+    private lateinit var faceFoundTextView: TextView
+    private lateinit var withoutMaskTextView: TextView
+    private lateinit var withMaskTextView: TextView
     private val REQUEST_GALLERY_CODE: Int
         get() = 101
+
+    private var face_found : Int = 0
+    private var mask_found : Int = 0
+    private var nomask_found : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,10 +47,13 @@ class MainActivity : AppCompatActivity() {
             .setConfidenceThreshold(0.0F)
             .build()
         labeler = ImageLabeling.getClient(autoMLImageLabelerOptions)
-
+        faceFoundTextView = findViewById(R.id.faceFound)
+        withMaskTextView = findViewById(R.id.withMask)
+        withoutMaskTextView = findViewById(R.id.withoutMask)
         imageView = findViewById(R.id.imageView)
         button = findViewById(R.id.button)
         button.setOnClickListener {
+            cleanupVariables()
             val intent = Intent()
             intent.type = "image/*"
             intent.action = Intent.ACTION_GET_CONTENT
@@ -52,6 +62,12 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_GALLERY_CODE
             )
         }
+    }
+
+    private fun cleanupVariables() {
+        face_found = 0
+        mask_found = 0
+        nomask_found = 0
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -67,7 +83,6 @@ class MainActivity : AppCompatActivity() {
                 val bmp : Bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver , data.data)
                 val mutableBitmap : Bitmap = bmp.copy(Bitmap.Config.ARGB_8888,true)
                 val canvas : Canvas = Canvas(mutableBitmap)
-                Toast.makeText(this, getString(R.string.face_detecting), Toast.LENGTH_LONG).show()
 
                 // create Face Detector options
                 // ACCURATE OR HARD -> accuracy
@@ -89,6 +104,7 @@ class MainActivity : AppCompatActivity() {
                         .addOnSuccessListener {
                             //face_detected
                             for (face in it) {
+                                face_found++
                                 val bounds: Rect = face.boundingBox
                                 val paint : Paint = Paint()
 
@@ -117,31 +133,37 @@ class MainActivity : AppCompatActivity() {
                                         Log.i("MASK ###",mask_confidence.toString())
 
                                         if(nomask_confidence >= mask_confidence){
+                                            nomask_found++
                                             val canvas : Canvas = Canvas(mutableBitmap)
                                             Log.i("AANDAR ###",nomask_confidence.toString())
                                             paint.color = Color.RED
                                             paint.strokeWidth = 10F
                                             paint.style = Paint.Style.STROKE
                                             canvas.drawRect(bounds,paint)
+                                            withoutMaskTextView.text = getString(R.string.without_mask) + " " + nomask_found
                                         }else{
+                                            mask_found++
                                             val canvas : Canvas = Canvas(mutableBitmap)
                                             paint.color = Color.GREEN
                                             paint.strokeWidth = 10F
                                             paint.style = Paint.Style.STROKE
                                             canvas.drawRect(bounds,paint)
+                                            withMaskTextView.text = getString(R.string.with_mask) + " " + mask_found
                                         }
                                         imageView.setImageBitmap(mutableBitmap)
                                     }
                                     .addOnFailureListener { e ->
-                                        
+
                                     }
 
                             }
-                            Toast.makeText(this, getString(R.string.face_found), Toast.LENGTH_LONG).show()
+                            faceFoundTextView.text = getString(R.string.face_found_number) + " " + face_found
+                            withMaskTextView.text = getString(R.string.with_mask) + " " + mask_found
+                            withoutMaskTextView.text = getString(R.string.without_mask) + " " + nomask_found
                         }
                         .addOnFailureListener {
                             //face_not_detected
-                            Toast.makeText(this, getString(R.string.face_not_found), Toast.LENGTH_LONG).show()
+                            faceFoundTextView.text = getString(R.string.face_found_number) + " " + face_found
                         }
             } catch (e: IOException) {
                 e.printStackTrace()
