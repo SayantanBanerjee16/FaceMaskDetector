@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
-import sun.awt.windows.ThemeReader.getPosition
 import java.io.IOException
 
 
@@ -56,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                 // create Face Detector options
                 // ACCURATE OR HARD -> accuracy
                 // ALL_LANDMARKS OR NO_LANDMARKS -> identifying Eyes, cheeks, lips, mouth, ears etc
-                // CONTOUR OR NO_CONTOUR -> smiling & eyes open
+                // CLASSIFICATION OR NO_CLASSIFICATION -> smiling & eyes open
                 val options =
                     FirebaseVisionFaceDetectorOptions.Builder()
                         .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
@@ -74,13 +72,18 @@ class MainActivity : AppCompatActivity() {
                             //face_detected
                             for (face in it) {
                                 val bounds: Rect = face.boundingBox
-                                val paint : Paint = Paint()
+
+                                val resizedbitmap =
+                                    Bitmap.createBitmap(mutableBitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
+
+                                val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
                                 paint.color = Color.RED
                                 paint.strokeWidth = 10F
-                                paint.style = Paint.Style.STROKE
+                                paint.style = Paint.Style.FILL
                                 canvas.drawRect(bounds,paint)
+                                imageView.setImageBitmap(resizedbitmap)
                             }
-                            imageView.setImageBitmap(mutableBitmap)
+                        //    imageView.setImageBitmap(mutableBitmap)
                             Toast.makeText(this, getString(R.string.face_found), Toast.LENGTH_LONG).show()
                         }
                         .addOnFailureListener {
