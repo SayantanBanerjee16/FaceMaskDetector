@@ -1,7 +1,7 @@
 # Face Mask Detector Android App
 ## Description
 
-In this recent global pandemic, it is must to wear a musk when going into a crowded place. So it is an Android application which take a picture as input and detectes human faces and classifies them as wearing mask or not.
+In this recent global pandemic, it is very essential to wear a mask while going into crowded place. So it is an Android application which take a picture as input and detectes human faces and classifies them as wearing mask or not.
 
 ## Final Product
 
@@ -20,4 +20,4 @@ Navigate to /facedetector folder to view the initial data used for building the 
 
 ## Generated TFlite Model
 
-Visit /app/src/main/assets/modelfiles to get the model.
+Visit /TFlite_model folder to get the model.
