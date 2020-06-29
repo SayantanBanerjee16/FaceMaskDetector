@@ -16,8 +16,8 @@ In this recent global pandemic, it is very essential to wear a mask while going 
 
 ## Training data
 
-Navigate to [/facedetector](https://github.com/SayantanBanerjee16/FaceMaskDetector/facedetector) folder to view the initial data used for building the TFlite Model.
+Navigate to [/facedetector](https://github.com/SayantanBanerjee16/FaceMaskDetector/tree/master/facedetector) folder to view the initial data used for building the TFlite Model.
 
 ## Generated TFlite Model
 
-Visit [/TFlite_model](https://github.com/SayantanBanerjee16/FaceMaskDetector/TFlite_model) folder to get the model.
+Visit [/TFlite_model](https://github.com/SayantanBanerjee16/FaceMaskDetector/tree/master/TFlite_model) folder to get the model.
